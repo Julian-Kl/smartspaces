@@ -1,13 +1,15 @@
 import React, { useEffect } from 'react';
 import './App.css';
-import { Token } from './services/apiConnection';
+import { Token, Things } from './services/apiConnection';
 
 function App() {
 
-  const currentToken = new Token();
+  const CurrentToken = new Token();
+  const CurrentThings = new Things();
 
   useEffect(() => {
-    currentToken.loadToken();
+    CurrentToken.loadToken();
+    CurrentThings.showThings();
   });
 
   return (

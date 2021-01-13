@@ -1,9 +1,10 @@
 class BaseApi {
     _baseUrl = "https://api2.arduino.cc/iot/";
+    _corsAnywhereUrl = "https://cors-anywhere.herokuapp.com/";
 }
 
 export class Token extends BaseApi {
-    tokenUrl = `${this._baseUrl}v1/clients/token`;
+    tokenUrl = `${this._corsAnywhereUrl}${this._baseUrl}v1/clients/token`;
     clientData = new URLSearchParams({
         "grant_type": "client_credentials",
         "client_id": "buwGgTfrnOngcVmDyHG6Epf3VdJHDhDg",
@@ -12,7 +13,7 @@ export class Token extends BaseApi {
     })
 
     async requestToken() {
-        var options = {
+        let options = {
             method: "POST",
             credentials: 'same-origin',
             header: {
@@ -23,7 +24,7 @@ export class Token extends BaseApi {
             body: this.clientData
         }
 
-        await fetch("https://cors-anywhere.herokuapp.com/https://api2.arduino.cc/iot/v1/clients/token", options)
+        await fetch(this.tokenUrl, options)
             .then(response => response.json())
             .then(data => {
                 console.log('Success:', data);
@@ -35,34 +36,63 @@ export class Token extends BaseApi {
             })
             .catch((error) => {
                 console.error('Error:', error);
-                return(error);
+                return (error);
             });
     }
-
 
     async loadToken() {
         console.log("Token loading...");
         let localTokenSet = false;
         let localTokenExpired = false;
-        if(localStorage.getItem("access_token")){
-          localTokenSet = true;
-          const expiringTime = +(localStorage.getItem("expires_in"));
-          const requestTimestamp = +(localStorage.getItem("request_time"));
-          const expiringTimestamp = requestTimestamp + (expiringTime * 100);
-          const currentTimestamp = Date.now();
-  
-          console.log("Saved token found in localstorage");
-  
-          if(expiringTimestamp <= currentTimestamp){
-            localTokenExpired = true;
-  
-            console.log("Saved token in localstorage is expired.")
-          }
+        if (localStorage.getItem("access_token")) {
+            localTokenSet = true;
+            const expiringTime = +(localStorage.getItem("expires_in"));
+            const requestTimestamp = +(localStorage.getItem("request_time"));
+            const expiringTimestamp = requestTimestamp + (expiringTime * 100);
+            const currentTimestamp = Date.now();
+
+            console.log("Saved token found in localstorage");
+
+            if (expiringTimestamp <= currentTimestamp) {
+                localTokenExpired = true;
+
+                console.log("Saved token in localstorage is expired.")
+            }
         }
-  
-        if(!localTokenSet || localTokenExpired){
-          console.log("New token loading.");
-          await this.requestToken();
+
+        if (!localTokenSet || localTokenExpired) {
+            console.log("New token loading.");
+            await this.requestToken();
         }
+    }
+}
+
+export class Things extends BaseApi {
+    accessToken = localStorage.getItem("access_token");
+    tokenType = localStorage.getItem("token_type");
+    id = "4f61da74-8f51-4258-b846-33f3bdd96c97";
+    thingsUrl = `${this._corsAnywhereUrl}${this._baseUrl}v2/things/${this.id}`;
+
+    async showThings() {
+        console.log("Things loading...");
+        let options = {
+            credentials: 'same-origin',
+            method: "GET",
+            header: {
+                "Authorization": `${this.tokenType} ${this.accessToken}`,
+                "Cache-Control": "no-cache",
+                "Access-Control-Allow-Credentials": "true"
+            }
+        }
+
+        await fetch(this.thingsUrl, options)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                return (error);
+            });
     }
 }
