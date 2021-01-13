@@ -12,6 +12,14 @@ function App() {
 
   useEffect(() => {
     CurrentToken.loadToken();
+    
+    console.log("Loading values.")
+    CurrentThings.showThings();
+
+    setLight(localStorage.getItem("light"));
+    setAxis(localStorage.getItem("axis"));
+    setAir(localStorage.getItem("air"));
+
     setInterval(() => {
       console.log("updating values")
       CurrentThings.showThings();
@@ -19,7 +27,7 @@ function App() {
       setLight(localStorage.getItem("light"));
       setAxis(localStorage.getItem("axis"));
       setAir(localStorage.getItem("air"));
-    }, 100000);
+    }, 10000);
   });
 
   return (
