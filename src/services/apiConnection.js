@@ -16,7 +16,7 @@ export class Token extends BaseApi {
         let options = {
             method: "POST",
             credentials: 'same-origin',
-            header: {
+            headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
                 "Cache-Control": "no-cache",
                 "Access-Control-Allow-Credentials": "true"
@@ -78,7 +78,7 @@ export class Things extends BaseApi {
         let options = {
             credentials: 'same-origin',
             method: "GET",
-            header: {
+            headers: {
                 "Authorization": `${this.tokenType} ${this.accessToken}`,
                 "Cache-Control": "no-cache",
                 "Access-Control-Allow-Credentials": "true"
@@ -89,6 +89,9 @@ export class Things extends BaseApi {
             .then(response => response.json())
             .then(data => {
                 console.log('Success:', data);
+                localStorage.setItem('light', data.properties[0].last_value);
+                localStorage.setItem('axis', data.properties[1].last_value);
+                localStorage.setItem('air', data.properties[2].last_value);
             })
             .catch((error) => {
                 console.error('Error:', error);
